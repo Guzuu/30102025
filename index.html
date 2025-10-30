@@ -1,500 +1,662 @@
-<!DOCTYPE html> <html lang="pl"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Quiz Chemiczny dla Biotechnologów</title> <style> * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px;
-        min-height: 100vh;
-    }
-    
-    .container {
-        max-width: 900px;
-        margin: 0 auto;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        overflow: hidden;
-    }
-    
-    .header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 30px;
-        text-align: center;
-    }
-    
-    .header h1 {
-        font-size: 2em;
-        margin-bottom: 10px;
-    }
-    
-    .header p {
-        opacity: 0.9;
-        font-size: 1.1em;
-    }
-    
-    .content {
-        padding: 30px;
-    }
-    
-    .instructions {
-        background: #f8f9fa;
-        border-left: 4px solid #667eea;
-        padding: 20px;
-        margin-bottom: 30px;
-        border-radius: 8px;
-    }
-    
-    .instructions h3 {
-        color: #667eea;
-        margin-bottom: 10px;
-    }
-    
-    .instructions ul {
-        margin-left: 20px;
-    }
-    
-    .instructions li {
-        margin: 8px 0;
-        color: #333;
-    }
-    
-    .round {
-        margin-bottom: 40px;
-    }
-    
-    .round-header {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 15px 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        font-size: 1.3em;
-        font-weight: bold;
-    }
-    
-    .round.bonus .round-header {
-        background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .question {
-        background: #ffffff;
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 15px;
-        transition: all 0.3s ease;
-    }
-    
-    .question:hover {
-        border-color: #667eea;
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
-    }
-    
-    .question-number {
-        color: #667eea;
-        font-weight: bold;
-        font-size: 1.1em;
-        margin-bottom: 10px;
-    }
-    
-    .question-text {
-        color: #333;
-        font-size: 1.05em;
-        line-height: 1.6;
-        margin-bottom: 15px;
-    }
-    
-    .answer {
-        background: #f8f9fa;
-        border-left: 4px solid #28a745;
-        padding: 15px;
-        border-radius: 5px;
-        display: none;
-        margin-top: 10px;
-    }
-    
-    .answer.show {
-        display: block;
-        animation: slideDown 0.3s ease;
-    }
-    
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Chemiczny dla Biotechnologów</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
         }
-    }
-    
-    .answer-label {
-        color: #28a745;
-        font-weight: bold;
-        margin-bottom: 8px;
-    }
-    
-    .answer-text {
-        color: #333;
-        line-height: 1.6;
-    }
-    
-    .show-answer-btn {
-        background: #667eea;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 0.95em;
-        transition: all 0.3s ease;
-    }
-    
-    .show-answer-btn:hover {
-        background: #764ba2;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-    }
-    
-    .show-answer-btn.active {
-        background: #28a745;
-    }
-    
-    .summary {
-        background: #f8f9fa;
-        padding: 25px;
-        border-radius: 10px;
-        margin-top: 30px;
-    }
-    
-    .summary h3 {
-        color: #667eea;
-        margin-bottom: 15px;
-    }
-    
-    .summary ul {
-        margin-left: 20px;
-    }
-    
-    .summary li {
-        margin: 8px 0;
-        color: #333;
-    }
-</style>
-</head> <body> <div class="container"> <div class="header"> <h1>🧪 Quiz Chemiczny dla Biotechnologów 🚗</h1> <p>Edycja Samochodowa - Poziom Magisterski</p> </div>
-    <div class="content">
-        <div class="instructions">
-            <h3>📋 Instrukcje</h3>
-            <ul>
-                <li>Jedna osoba czyta pytania</li>
-                <li>Dwie osoby rywalizują - kto pierwszy powie poprawną odpowiedź</li>
-                <li>Za każdą poprawną odpowiedź: <strong>1 punkt</strong></li>
-                <li>Pytania bonusowe: <strong>2 punkty</strong></li>
-                <li>Kliknij przycisk, aby pokazać odpowiedź</li>
-            </ul>
-        </div>
-
-        <!-- RUNDA 1 -->
-        <div class="round">
-            <div class="round-header">RUNDA 1: Szybkie Strzały (rozgrzewka)</div>
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+            color: #333;
+        }
+        
+        .round {
+            margin-bottom: 40px;
+        }
+        
+        .round-header {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .round.bonus .round-header {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .question {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .question:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+        
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            color: #333;
+            font-size: 1.05em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .answer {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .answer.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .answer-label {
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .answer-text {
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .show-answer-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+        
+        .show-answer-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .show-answer-btn.active {
+            background: #28a745;
+        }
+        
+        .summary {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .summary h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .summary ul {
+            margin-left: 20px;
+        }
+        
+        .summary li {
+            margin: 8px 0;
+            color: #333;
+        }
+        
+        .score-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 20px;
+            min-width: 150px;
+            z-index: 1000;
+        }
+        
+        .score-panel h3 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .player {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .player:last-child {
+            margin-bottom: 0;
+            border-left-color: #764ba2;
+        }
+        
+        .player-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+        
+        .player-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .score-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .score-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .score-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .score-btn.plus {
+            background: #28a745;
+        }
+        
+        .score-btn.plus:hover {
+            background: #218838;
+            transform: scale(1.1);
+        }
+        
+        .score-btn.minus {
+            background: #dc3545;
+        }
+        
+        .score-btn.minus:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 768px) {
+            .score-panel {
+                top: 10px;
+                right: 10px;
+                padding: 15px;
+                min-width: 130px;
+            }
             
-            <div class="question">
-                <div class="question-number">Pytanie 1</div>
-                <div class="question-text">Jaki enzym odpowiada za replikację DNA?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Polimeraza DNA</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 2</div>
-                <div class="question-text">Ile wiązań wodorowych występuje między guaniną a cytozyną?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">3 wiązania</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 3</div>
-                <div class="question-text">Który aminokwas nie ma chiralnego centrum?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Glicyna</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 4</div>
-                <div class="question-text">Jak nazywa się proces dodawania grupy fosforanowej do białka?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Fosforylacja</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 5</div>
-                <div class="question-text">Jaki kofaktor jest niezbędny dla karboksylaz?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Biotyna</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- RUNDA 2 -->
-        <div class="round">
-            <div class="round-header">RUNDA 2: Metabolizm i Bioenergetyka</div>
+            .score-panel h3 {
+                font-size: 1em;
+            }
             
-            <div class="question">
-                <div class="question-number">Pytanie 6</div>
-                <div class="question-text">Ile cząsteczek ATP netto powstaje z jednej glukozy w glikolizie?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">2 ATP (brutto 4, zużyte 2)</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 7</div>
-                <div class="question-text">Który kompleks łańcucha oddechowego pompuje najwięcej protonów?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Kompleks I (NADH dehydrogenaza) - 4 protony</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 8</div>
-                <div class="question-text">Co jest bezpośrednim donorem grup metylowych w komórce?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">SAM (S-adenozylometionina)</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 9</div>
-                <div class="question-text">Jaki enzym katalizuje pierwszy etap cyklu mocznikowego?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Syntetaza karbamylofosfatowa I</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 10</div>
-                <div class="question-text">Który aminokwas może być prekursorem glukozy, ketonów I neurotransmiterów?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Fenyloalanina (lub tyrozyna)</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- RUNDA 3 -->
-        <div class="round">
-            <div class="round-header">RUNDA 3: Chemia Organiczna i Struktura</div>
+            .player-name {
+                font-size: 0.95em;
+            }
             
-            <div class="question">
-                <div class="question-number">Pytanie 11</div>
-                <div class="question-text">Jaką konformację pierścienia preferuje D-glukoza w roztworze wodnym?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Krzesłową β-D-glukopiranozy (4C1 z grupą OH-1 ekwatorialną)</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 12</div>
-                <div class="question-text">Jak nazywa się reakcja kondensacji aldehydu z aminą, tworząca zasadę Schiffa?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Reakcja iminy / tworzenie zasady Schiffa</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 13</div>
-                <div class="question-text">Które wiązania peptydowe mają charakter częściowo podwójny?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Wiązanie C-N (rezonans mezomeryczny)</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 14</div>
-                <div class="question-text">Jaki mechanizm charakteryzuje serynowe proteazy?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Kataliza nukleofilowa z triadą katalityczną Ser-His-Asp</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 15</div>
-                <div class="question-text">Co to jest tautomeria keto-enolowa i dlaczego jest ważna dla DNA?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Przegrupowanie między formą ketonową a enolową zasad; rzadkie formy tautomeryczne mogą prowadzić do błędnego parowania zasad i mutacji</div>
+            .score-number {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Score Panel -->
+    <div class="score-panel">
+        <h3>🏆 Wyniki</h3>
+        <div class="player">
+            <div class="player-name">Lila</div>
+            <div class="player-score">
+                <span class="score-number" id="lila-score">0</span>
+                <div class="score-buttons">
+                    <button class="score-btn plus" onclick="changeScore('lila', 1)">+</button>
+                    <button class="score-btn minus" onclick="changeScore('lila', -1)">−</button>
                 </div>
             </div>
         </div>
-
-        <!-- RUNDA 4 -->
-        <div class="round">
-            <div class="round-header">RUNDA 4: Biotechnologia i Analityka</div>
-            
-            <div class="question">
-                <div class="question-number">Pytanie 16</div>
-                <div class="question-text">Jaką technikę wykorzystuje się do oznaczania interakcji białko-białko w czasie rzeczywistym bez znakowania?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">SPR (rezonans plazmonów powierzchniowych) lub BLI (interferometria biowarstwowa)</div>
+        <div class="player">
+            <div class="player-name">Filip</div>
+            <div class="player-score">
+                <span class="score-number" id="filip-score">0</span>
+                <div class="score-buttons">
+                    <button class="score-btn plus" onclick="changeScore('filip', 1)">+</button>
+                    <button class="score-btn minus" onclick="changeScore('filip', -1)">−</button>
                 </div>
             </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 17</div>
-                <div class="question-text">Jaki jest mechanizm działania CRISPR-Cas9 na poziomie chemicznym?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Endonukleaza Cas9 tworzy dwuniciowe pęknięcie DNA poprzez hydrolizę wiązań fosfodiestrowych po rozpoznaniu sekwencji przez RNA guide</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 18</div>
-                <div class="question-text">Co to jest efekt izotopowy kinetyczny i jak go wykorzystuje się w badaniach enzymatycznych?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Różnica w szybkości reakcji z izotopami (np. H vs D); wykorzystywany do określenia, czy rozrywanie danego wiązania jest etapem limitującym szybkość</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 19</div>
-                <div class="question-text">Jakie wiązanie jest rozszczepiane podczas edycji Edmana?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Wiązanie peptydowe między N-końcowym a następnym aminokwasem</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">Pytanie 20</div>
-                <div class="question-text">Jaki mechanizm leży u podstaw chemiluminescencji luminolu?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Utlenienie przez H₂O₂ w obecności peroksydazy → powstanie 3-aminoftalanu w stanie wzbudzonym → emisja światła przy powrocie do stanu podstawowego</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- RUNDA 5 - BONUS -->
-        <div class="round bonus">
-            <div class="round-header">🏆 RUNDA 5: PYTANIA BONUSOWE (2 pkt każde)</div>
-            
-            <div class="question">
-                <div class="question-number">BONUS 1</div>
-                <div class="question-text">Wyjaśnij paradoks Levinthala - dlaczego białka fałdują się tak szybko mimo astronomicznej liczby możliwych konformacji?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Białka nie próbują wszystkich konformacji losowo - fałdowanie następuje przez hierarchiczne struktury pośrednie (ścieżka fałdowania kierowana energetycznie przez lejek energetyczny, tworzenie najpierw struktur lokalnych, potem globalnych)</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">BONUS 2</div>
-                <div class="question-text">Co to jest rezonans Fermiego i gdzie występuje w hemoglobinie?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Sprzężenie drgań o podobnych częstotliwościach; w hemoglobinie występuje między histydyną dystalną a ligandem CO, wpływa na powinowactwo do ligandów</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">BONUS 3</div>
-                <div class="question-text">Opisz mechanizm katalityczny rybozymu - jak RNA może działać katalitycznie bez grup funkcyjnych białek?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">RNA wykorzystuje zasady azotowe jako kwasy/zasady ogólne, koordynuje jony metali (Mg²⁺) do stabilizacji stanu przejściowego, i wykorzystuje efekty strukturalne (np. przybliżenie substratów). Przykład: rybosom katalizuje tworzenie wiązania peptydowego przez mechanizm katalityczny z udziałem A2451 (E. coli)</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">BONUS 4</div>
-                <div class="question-text">Czym różni się mechanizm SN1 od SN2 i który jest preferowany w hydrolizie ATP przez kinazy?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">SN1 - dwuetapowy, z karbokationem, racemizacja; SN2 - jednoetapowy, inwersja konfiguracji. Kinazy używają mechanizmu SN2 z bezpośrednim transferem grupy fosforanowej z inwersją konfiguracji przy atomie fosforu</div>
-                </div>
-            </div>
-
-            <div class="question">
-                <div class="question-number">BONUS 5</div>
-                <div class="question-text">Co to jest efekt anomeryczny i jak wpływa na stabilność konformacyjną cukrów?</div>
-                <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
-                <div class="answer">
-                    <div class="answer-label">✓ Odpowiedź:</div>
-                    <div class="answer-text">Preferencja dla konformacji aksjalnej grup przy węglu anomerycznym (C1) z powodu stabilizacji orbitali n→σ* między parą wolną tlenu pierścieniowego a orbitałem σ* wiązania C-O. Wyjaśnia, dlaczego anomer α ma grupę OH aksjalnie mimo odpychania sterycznego</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PODSUMOWANIE -->
-        <div class="summary">
-            <h3>📊 Podsumowanie</h3>
-            <ul>
-                <li><strong>Pytania standardowe (1-20):</strong> po 1 punkt = 20 punktów</li>
-                <li><strong>Pytania bonusowe (B1-B5):</strong> po 2 punkty = 10 punktów</li>
-                <li><strong>Maksymalna liczba punktów:</strong> 30 punktów</li>
-            </ul>
-            <p style="margin-top: 15px; color: #667eea; font-weight: bold;">🎉 Powodzenia w quizie! 🧬🔬</p>
         </div>
     </div>
-</div>
 
-<script>
-    function toggleAnswer(button) {
-        const answer = button.nextElementSibling;
-        if (answer.classList.contains('show')) {
-            answer.classList.remove('show');
-            button.textContent = 'Pokaż odpowiedź';
-            button.classList.remove('active');
-        } else {
-            answer.classList.add('show');
-            button.textContent = 'Ukryj odpowiedź';
-            button.classList.add('active');
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Quiz Chemiczny dla Biotechnologów 🚗</h1>
+            <p>Edycja Samochodowa - Poziom Magisterski</p>
+        </div>
+        
+        <div class="content">
+            <div class="instructions">
+                <h3>📋 Instrukcje</h3>
+                <ul>
+                    <li>Jedna osoba czyta pytania</li>
+                    <li>Dwie osoby rywalizują - kto pierwszy powie poprawną odpowiedź</li>
+                    <li>Za każdą poprawną odpowiedź: <strong>1 punkt</strong></li>
+                    <li>Pytania bonusowe: <strong>2 punkty</strong></li>
+                    <li>Kliknij przycisk, aby pokazać odpowiedź</li>
+                </ul>
+            </div>
+
+            <!-- RUNDA 1 -->
+            <div class="round">
+                <div class="round-header">RUNDA 1: Szybkie Strzały (rozgrzewka)</div>
+                
+                <div class="question">
+                    <div class="question-number">Pytanie 1</div>
+                    <div class="question-text">Jaki enzym odpowiada za replikację DNA?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Polimeraza DNA</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 2</div>
+                    <div class="question-text">Ile wiązań wodorowych występuje między guaniną a cytozyną?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">3 wiązania</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 3</div>
+                    <div class="question-text">Który aminokwas nie ma chiralnego centrum?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Glicyna</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 4</div>
+                    <div class="question-text">Jak nazywa się proces dodawania grupy fosforanowej do białka?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Fosforylacja</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 5</div>
+                    <div class="question-text">Jaki kofaktor jest niezbędny dla karboksylaz?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Biotyna</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RUNDA 2 -->
+            <div class="round">
+                <div class="round-header">RUNDA 2: Metabolizm i Bioenergetyka</div>
+                
+                <div class="question">
+                    <div class="question-number">Pytanie 6</div>
+                    <div class="question-text">Ile cząsteczek ATP netto powstaje z jednej glukozy w glikolizie?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">2 ATP (brutto 4, zużyte 2)</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 7</div>
+                    <div class="question-text">Który kompleks łańcucha oddechowego pompuje najwięcej protonów?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Kompleks I (NADH dehydrogenaza) - 4 protony</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 8</div>
+                    <div class="question-text">Co jest bezpośrednim donorem grup metylowych w komórce?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">SAM (S-adenozylometionina)</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 9</div>
+                    <div class="question-text">Jaki enzym katalizuje pierwszy etap cyklu mocznikowego?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Syntetaza karbamylofosfatowa I</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 10</div>
+                    <div class="question-text">Który aminokwas może być prekursorem glukozy, ketonów I neurotransmiterów?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Fenyloalanina (lub tyrozyna)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RUNDA 3 -->
+            <div class="round">
+                <div class="round-header">RUNDA 3: Chemia Organiczna i Struktura</div>
+                
+                <div class="question">
+                    <div class="question-number">Pytanie 11</div>
+                    <div class="question-text">Jaką konformację pierścienia preferuje D-glukoza w roztworze wodnym?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Krzesłową β-D-glukopiranozy (4C1 z grupą OH-1 ekwatorialną)</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 12</div>
+                    <div class="question-text">Jak nazywa się reakcja kondensacji aldehydu z aminą, tworząca zasadę Schiffa?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Reakcja iminy / tworzenie zasady Schiffa</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 13</div>
+                    <div class="question-text">Które wiązania peptydowe mają charakter częściowo podwójny?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Wiązanie C-N (rezonans mezomeryczny)</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 14</div>
+                    <div class="question-text">Jaki mechanizm charakteryzuje serynowe proteazy?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Kataliza nukleofilowa z triadą katalityczną Ser-His-Asp</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 15</div>
+                    <div class="question-text">Co to jest tautomeria keto-enolowa i dlaczego jest ważna dla DNA?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Przegrupowanie między formą ketonową a enolową zasad; rzadkie formy tautomeryczne mogą prowadzić do błędnego parowania zasad i mutacji</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RUNDA 4 -->
+            <div class="round">
+                <div class="round-header">RUNDA 4: Biotechnologia i Analityka</div>
+                
+                <div class="question">
+                    <div class="question-number">Pytanie 16</div>
+                    <div class="question-text">Jaką technikę wykorzystuje się do oznaczania interakcji białko-białko w czasie rzeczywistym bez znakowania?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">SPR (rezonans plazmonów powierzchniowych) lub BLI (interferometria biowarstwowa)</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 17</div>
+                    <div class="question-text">Jaki jest mechanizm działania CRISPR-Cas9 na poziomie chemicznym?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Endonukleaza Cas9 tworzy dwuniciowe pęknięcie DNA poprzez hydrolizę wiązań fosfodiestrowych po rozpoznaniu sekwencji przez RNA guide</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 18</div>
+                    <div class="question-text">Co to jest efekt izotopowy kinetyczny i jak go wykorzystuje się w badaniach enzymatycznych?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Różnica w szybkości reakcji z izotopami (np. H vs D); wykorzystywany do określenia, czy rozrywanie danego wiązania jest etapem limitującym szybkość</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 19</div>
+                    <div class="question-text">Jakie wiązanie jest rozszczepiane podczas edycji Edmana?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Wiązanie peptydowe między N-końcowym a następnym aminokwasem</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">Pytanie 20</div>
+                    <div class="question-text">Jaki mechanizm leży u podstaw chemiluminescencji luminolu?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Utlenienie przez H₂O₂ w obecności peroksydazy → powstanie 3-aminoftalanu w stanie wzbudzonym → emisja światła przy powrocie do stanu podstawowego</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RUNDA 5 - BONUS -->
+            <div class="round bonus">
+                <div class="round-header">🏆 RUNDA 5: PYTANIA BONUSOWE (2 pkt każde)</div>
+                
+                <div class="question">
+                    <div class="question-number">BONUS 1</div>
+                    <div class="question-text">Wyjaśnij paradoks Levinthala - dlaczego białka fałdują się tak szybko mimo astronomicznej liczby możliwych konformacji?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Białka nie próbują wszystkich konformacji losowo - fałdowanie następuje przez hierarchiczne struktury pośrednie (ścieżka fałdowania kierowana energetycznie przez lejek energetyczny, tworzenie najpierw struktur lokalnych, potem globalnych)</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">BONUS 2</div>
+                    <div class="question-text">Co to jest rezonans Fermiego i gdzie występuje w hemoglobinie?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Sprzężenie drgań o podobnych częstotliwościach; w hemoglobinie występuje między histydyną dystalną a ligandem CO, wpływa na powinowactwo do ligandów</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">BONUS 3</div>
+                    <div class="question-text">Opisz mechanizm katalityczny rybozymu - jak RNA może działać katalitycznie bez grup funkcyjnych białek?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">RNA wykorzystuje zasady azotowe jako kwasy/zasady ogólne, koordynuje jony metali (Mg²⁺) do stabilizacji stanu przejściowego, i wykorzystuje efekty strukturalne (np. przybliżenie substratów). Przykład: rybosom katalizuje tworzenie wiązania peptydowego przez mechanizm katalityczny z udziałem A2451 (E. coli)</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">BONUS 4</div>
+                    <div class="question-text">Czym różni się mechanizm SN1 od SN2 i który jest preferowany w hydrolizie ATP przez kinazy?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">SN1 - dwuetapowy, z karbokationem, racemizacja; SN2 - jednoetapowy, inwersja konfiguracji. Kinazy używają mechanizmu SN2 z bezpośrednim transferem grupy fosforanowej z inwersją konfiguracji przy atomie fosforu</div>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <div class="question-number">BONUS 5</div>
+                    <div class="question-text">Co to jest efekt anomeryczny i jak wpływa na stabilność konformacyjną cukrów?</div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(this)">Pokaż odpowiedź</button>
+                    <div class="answer">
+                        <div class="answer-label">✓ Odpowiedź:</div>
+                        <div class="answer-text">Preferencja dla konformacji aksjalnej grup przy węglu anomerycznym (C1) z powodu stabilizacji orbitali n→σ* między parą wolną tlenu pierścieniowego a orbitałem σ* wiązania C-O. Wyjaśnia, dlaczego anomer α ma grupę OH aksjalnie mimo odpychania sterycznego</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PODSUMOWANIE -->
+            <div class="summary">
+                <h3>📊 Podsumowanie</h3>
+                <ul>
+                    <li><strong>Pytania standardowe (1-20):</strong> po 1 punkt = 20 punktów</li>
+                    <li><strong>Pytania bonusowe (B1-B5):</strong> po 2 punkty = 10 punktów</li>
+                    <li><strong>Maksymalna liczba punktów:</strong> 30 punktów</li>
+                </ul>
+                <p style="margin-top: 15px; color: #667eea; font-weight: bold;">🎉 Powodzenia w quizie! 🧬🔬</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scores = {
+            lila: 0,
+            filip: 0
+        };
+
+        function changeScore(player, delta) {
+            scores[player] = Math.max(0, scores[player] + delta);
+            document.getElementById(player + '-score').textContent = scores[player];
         }
-    }
-</script>
-</body> </html>
+
+        function toggleAnswer(button) {
+            const answer = button.nextElementSibling;
+            if (answer.classList.contains('show')) {
+                answer.classList.remove('show');
+                button.textContent = 'Pokaż odpowiedź';
+                button.classList.remove('active');
+            } else {
+                answer.classList.add('show');
+                button.textContent = 'Ukryj odpowiedź';
+                button.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
